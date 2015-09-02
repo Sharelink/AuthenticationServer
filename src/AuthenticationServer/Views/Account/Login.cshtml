@@ -1,0 +1,54 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model AuthenticationServer.Models.LoginViewModel
+@{
+    //ViewBag.Title = "Login";
+}
+<environment names="Development">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-touch-carousel/dist/css/bootstrap-touch-carousel.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</environment>
+<environment names="Staging,Production">
+    <link rel="stylesheet" href="//ajax.aspnetcdn.com/ajax/bootstrap/3.0.0/css/bootstrap.min.css"
+          asp-fallback-href="~/lib/bootstrap/css/bootstrap.min.css"
+          asp-fallback-test-class="hidden" asp-fallback-test-property="visibility" asp-fallback-test-value="hidden" />
+    <link rel="stylesheet" href="//ajax.aspnetcdn.com/ajax/bootstrap-touch-carousel/0.8.0/css/bootstrap-touch-carousel.css"
+          asp-fallback-href="~/lib/bootstrap-touch-carousel/css/bootstrap-touch-carousel.css"
+          asp-fallback-test-class="carousel-caption" asp-fallback-test-property="display" asp-fallback-test-value="none" />
+    <link rel="stylesheet" href="~/css/site.css" asp-file-version="true" />
+</environment>
+<div class="col-md-4">
+
+    <section>
+        <form asp-controller="Account" asp-action="Login" asp-route-scopes="@ViewData["Scopes"]" asp-route-returnurl="@ViewData["ReturnUrl"]" asp-route-appkey="@ViewData["Appkey"]" method="post" class="form-horizontal" role="form">
+            <h4>Use a local account to log in.</h4>
+            <hr />
+            <div asp-validation-summary="ValidationSummary.All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="LoginString" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="LoginString" value="@ViewData["LoginString"]" class="form-control" />
+                    <span asp-validation-for="LoginString" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <button type="submit" class="btn btn-default">Log in</button>
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

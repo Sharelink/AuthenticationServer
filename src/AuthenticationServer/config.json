@@ -1,0 +1,14 @@
+{
+  "Data": {
+    "App": {
+      "appname": "AuthenticationServer",
+      "appkey": "e1c91545bdb803aaeba2f5d4c86308327b93a2e2"
+    },
+    "ServerControlDBConnection": {
+      "connectionString": "server=192.168.0.20;user id=root;password=dfyybest;persistsecurityinfo=True;database=ServerControlDB;Pooling=true; Max Pool Size=50;"
+    },
+    "BahamutDBConnection": {
+      "connectionString": "server=192.168.0.20;user id=root;password=dfyybest;persistsecurityinfo=True;database=BahamutDB;Pooling=true; Max Pool Size=50;"
+    }
+  }
+}
