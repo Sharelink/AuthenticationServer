@@ -72,38 +72,15 @@ namespace AuthenticationServer.Controllers
                     var result = authService.LoginValidate(model.LoginString, model.Password);
                     if (result.Succeeded)
                     {
-                        string userId;
-                        var appUserAccountService = Startup.ServicesProvider.GetAppUserAccountService();
                         var svrCtrlService = Startup.ServicesProvider.GetServerControlManagementService();
                         var mostFreeAppService = svrCtrlService.GetMostFreeAppService(appkey);
                         var mostFreeFileAppService = svrCtrlService.GetMostFreeAppService("b078082bd9d5c63da1b4c5d546a9fa44b6c879b2");
                         dynamic docModel = mostFreeAppService.ServiceDocumentModel;
-                        ITokenRedisServerConfig redisSvrConfig = new TokenRedisServerConfig()
-                        {
-                            Db = docModel.TokenServer.Db,
-                            Host = docModel.TokenServer.Host,
-                            Password = docModel.TokenServer.Password,
-                            Port = docModel.TokenServer.Port
-                        };
-                        var tokenService = new TokenService(redisSvrConfig);
-                        var isNewUser = false;
-                        try
-                        {
-                            userId = appUserAccountService.GetAppUserIdOfAccountId(appkey, result.AccountID);
-                        }
-                        catch (NullReferenceException)
-                        {
-                            do
-                            {
-                                userId = IDUtil.GenerateLongId().ToString();
-                            } while (appUserAccountService.IsAppUserIdExists(appkey, userId));
-                            isNewUser = true;
-                        }
+                        var tokenService = Startup.ServicesProvider.GetTokenService();
                         var newSessionData = new AccountSessionData()
                         {
                             AccountId = result.AccountID,
                             Appkey = appkey,
-                            UserId = userId,
                             APITokenServer = docModel.APITokenServer
                         };
                         var atokenResult = tokenService.AllocateAccessToken(newSessionData).Result;
@@ -111,7 +88,7 @@ namespace AuthenticationServer.Controllers
                         {
                             throw new Exception("AllocateAccessToken Failed");
                         }
-                        var parameters = new { AccountID = result.AccountID, AccessToken = atokenResult.AccessToken, APITokenServer = atokenResult.APITokenServer,NewUser = isNewUser };
+                        var parameters = new { AccountID = result.AccountID, AccessToken = atokenResult.AccessToken, APITokenServer = atokenResult.APITokenServer};
                         return RedirectToAction("Returns", parameters);
                     }
                 }catch (NullReferenceException ex)
