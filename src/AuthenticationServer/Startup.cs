@@ -15,6 +15,7 @@ using Microsoft.Framework.Runtime;
 using BahamutService;
 using ServerControlService.Service;
 using BahamutService.Model;
+using DataLevelDefines;
 
 namespace AuthenticationServer
 {
@@ -45,11 +46,18 @@ namespace AuthenticationServer
 
             var bahamutDbConString = Configuration["Data:BahamutDBConnection:connectionString"];
             var svrControlDbConString = Configuration["Data:ServerControlDBConnection:connectionString"];
+            IRedisServerConfig tokenRedisServerConfig = new RedisServerConfig()
+            {
+                Db = long.Parse(Configuration["Data:TokenServer:Db"]),
+                Host = Configuration["Data:TokenServer:Host"],
+                Password = Configuration["Data:TokenServer:Password"],
+                Port = int.Parse(Configuration["Data:TokenServer:Port"])
+            };
             services.AddInstance(new AuthenticationService(bahamutDbConString));
-            services.AddInstance(new AppUserAccountService(bahamutDbConString));
             services.AddInstance(new BahamutAccountService(bahamutDbConString));
             services.AddInstance(new BahamutAppService(bahamutDbConString));
             services.AddInstance(new ServerControlManagementService(svrControlDbConString));
+            services.AddInstance(new TokenService(tokenRedisServerConfig));
             // Uncomment the following line to add Web API services which makes it easier to port Web API 2 controllers.
             // You will also need to add the Microsoft.AspNet.Mvc.WebApiCompatShim package to the 'dependencies' section of project.json.
             // services.AddWebApiConventions();
@@ -106,15 +114,14 @@ namespace AuthenticationServer
 
     public static class IGetBahamutServiceExtension
     {
+        public static TokenService GetTokenService(this IServiceProvider provider)
+        {
+            return provider.GetService<TokenService>();
+        }
 
         public static AuthenticationService GetAuthenticationService(this IServiceProvider provider)
         {
             return provider.GetService<AuthenticationService>();
-        }
-
-        public static AppUserAccountService GetAppUserAccountService(this IServiceProvider provider)
-        {
-            return provider.GetService<AppUserAccountService>();
         }
 
         public static BahamutAccountService GetBahamutAccountService(this IServiceProvider provider)

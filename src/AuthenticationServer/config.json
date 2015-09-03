@@ -9,6 +9,12 @@
     },
     "BahamutDBConnection": {
       "connectionString": "server=192.168.0.20;user id=root;password=dfyybest;persistsecurityinfo=True;database=BahamutDB;Pooling=true; Max Pool Size=50;"
+    },
+    "TokenServer": {
+      "Host": "192.168.0.20",
+      "Port": 6379,
+      "Password": null,
+      "Db": 0
     }
   }
 }
