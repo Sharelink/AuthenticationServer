@@ -16,14 +16,13 @@ namespace AuthenticationServer.Controllers
     {
 
         [HttpGet]
-        public IActionResult Returns(string AccountID,string AccessToken, string APITokenServer,bool NewUser = false)
+        public IActionResult Returns(string AccountID,string AccessToken, string APITokenServer)
         {
             return Json(new
             {
                 AccountID = AccountID,
                 AccessToken = AccessToken,
-                APITokenServer = APITokenServer,
-                NewUser = NewUser
+                APITokenServer = APITokenServer
             });
         }
 
