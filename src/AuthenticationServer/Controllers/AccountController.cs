@@ -16,13 +16,15 @@ namespace AuthenticationServer.Controllers
     {
 
         [HttpGet]
-        public IActionResult Returns(string AccountID,string AccessToken, string APITokenServer)
+        public IActionResult Returns(string AccountID,string AccessToken, string AppServerIP,int AppServerPort, string AppServiceUrl)
         {
             return Json(new
             {
                 AccountID = AccountID,
                 AccessToken = AccessToken,
-                APITokenServer = APITokenServer
+                AppServerIP = AppServerIP,
+                AppServerPort = AppServerPort,
+                AppServiceUrl = AppServiceUrl
             });
         }
 
@@ -72,8 +74,7 @@ namespace AuthenticationServer.Controllers
                     if (result.Succeeded)
                     {
                         var svrCtrlService = Startup.ServicesProvider.GetServerControlManagementService();
-                        var mostFreeAppService = svrCtrlService.GetMostFreeAppService(appkey);
-                        dynamic docModel = mostFreeAppService.ServiceDocumentModel;
+                        var appInstance = svrCtrlService.GetMostFreeAppInstance(appkey);
                         var tokenService = Startup.ServicesProvider.GetTokenService();
                         var newSessionData = new AccountSessionData()
                         {
@@ -85,10 +86,22 @@ namespace AuthenticationServer.Controllers
                         {
                             throw new Exception("AllocateAccessToken Failed");
                         }
-                        var parameters = new { AccountID = result.AccountID, AccessToken = atokenResult.AccessToken, APITokenServer = docModel.APITokenServer};
+                        var parameters = new
+                        {
+                            AccountID = result.AccountID,
+                            AccessToken = atokenResult.AccessToken,
+                            AppServerIP = appInstance.InstanceEndPointIP,
+                            AppServerPort = appInstance.InstanceEndPointPort,
+                            AppServiceUrl = appInstance.InstanceServiceUrl
+                        };
                         return RedirectToAction("Returns", parameters);
                     }
-                }catch (NullReferenceException ex)
+                }catch(NoAppInstanceException)
+                {
+                    ModelState.AddModelError(string.Empty, "No App Service Online");
+                    return PartialView(model);
+                }
+                catch (NullReferenceException ex)
                 {
                     ModelState.AddModelError(string.Empty, ex.Message);
                     return PartialView(model);

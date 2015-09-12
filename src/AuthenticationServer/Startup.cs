@@ -38,6 +38,14 @@ namespace AuthenticationServer
 
             var bahamutDbConString = Configuration["Data:BahamutDBConnection:connectionString"];
             var svrControlDbConString = Configuration["Data:ServerControlDBConnection:connectionString"];
+            IRedisServerConfig controlRedisServerConfig = new RedisServerConfig()
+            {
+                Db = long.Parse(Configuration["Data:ControlServiceServer:Db"]),
+                Host = Configuration["Data:ControlServiceServer:Host"],
+                Password = Configuration["Data:ControlServiceServer:Password"],
+                Port = int.Parse(Configuration["Data:ControlServiceServer:Port"])
+            };
+
             IRedisServerConfig tokenRedisServerConfig = new RedisServerConfig()
             {
                 Db = long.Parse(Configuration["Data:TokenServer:Db"]),
@@ -48,7 +56,7 @@ namespace AuthenticationServer
             services.AddInstance(new AuthenticationService(bahamutDbConString));
             services.AddInstance(new BahamutAccountService(bahamutDbConString));
             services.AddInstance(new BahamutAppService(bahamutDbConString));
-            services.AddInstance(new ServerControlManagementService(svrControlDbConString));
+            services.AddInstance(new ServerControlManagementService(controlRedisServerConfig));
             services.AddInstance(new TokenService(tokenRedisServerConfig));
             // Uncomment the following line to add Web API services which makes it easier to port Web API 2 controllers.
             // You will also need to add the Microsoft.AspNet.Mvc.WebApiCompatShim package to the 'dependencies' section of project.json.
