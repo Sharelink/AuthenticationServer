@@ -73,21 +73,19 @@ namespace AuthenticationServer.Controllers
                     {
                         var svrCtrlService = Startup.ServicesProvider.GetServerControlManagementService();
                         var mostFreeAppService = svrCtrlService.GetMostFreeAppService(appkey);
-                        var mostFreeFileAppService = svrCtrlService.GetMostFreeAppService("b078082bd9d5c63da1b4c5d546a9fa44b6c879b2");
                         dynamic docModel = mostFreeAppService.ServiceDocumentModel;
                         var tokenService = Startup.ServicesProvider.GetTokenService();
                         var newSessionData = new AccountSessionData()
                         {
                             AccountId = result.AccountID,
-                            Appkey = appkey,
-                            APITokenServer = docModel.APITokenServer
+                            Appkey = appkey
                         };
                         var atokenResult = tokenService.AllocateAccessToken(newSessionData).Result;
                         if (atokenResult == null)
                         {
                             throw new Exception("AllocateAccessToken Failed");
                         }
-                        var parameters = new { AccountID = result.AccountID, AccessToken = atokenResult.AccessToken, APITokenServer = atokenResult.APITokenServer};
+                        var parameters = new { AccountID = result.AccountID, AccessToken = atokenResult.AccessToken, APITokenServer = docModel.APITokenServer};
                         return RedirectToAction("Returns", parameters);
                     }
                 }catch (NullReferenceException ex)
