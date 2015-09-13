@@ -8,17 +8,11 @@
       "connectionString": "server=192.168.1.23;user id=root;password=dfyybest;persistsecurityinfo=True;database=BahamutDB;Pooling=true; Max Pool Size=50;"
     },
     "TokenServer": {
-      "Host": "192.168.1.23",
-      "Port": 6379,
-      "Password": null,
-      "Db": 0
+      "url": "redis://192.168.1.23:6379"
     },
 
     "ControlServiceServer": {
-      "Host": "192.168.1.23",
-      "Port": 6379,
-      "Password": null,
-      "Db": 0
+      "url": "redis://192.168.1.23:6379"
     }
   }
 }

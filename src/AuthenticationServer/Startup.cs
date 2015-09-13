@@ -8,6 +8,7 @@ using BahamutService;
 using ServerControlService.Service;
 using DataLevelDefines;
 using Microsoft.Dnx.Runtime;
+using ServiceStack.Redis;
 
 namespace AuthenticationServer
 {
@@ -23,12 +24,15 @@ namespace AuthenticationServer
             Configuration = builder.Build();
             Appkey = Configuration["Data:App:appkey"];
             Appname = Configuration["Data:App:appname"];
+
         }
 
         public IConfiguration Configuration { get; private set; }
         public static IServiceProvider ServicesProvider { get;private set; }
         public static string Appkey { get; private set; }
         public static string Appname { get; private set; }
+        public static IRedisClientsManager TokenServerClientManager { get; private set; }
+        public static IRedisClientsManager ControlServerServiceClientManager { get; private set; }
 
         // This method gets called by the runtime.
         public void ConfigureServices(IServiceCollection services)
@@ -38,26 +42,13 @@ namespace AuthenticationServer
 
             var bahamutDbConString = Configuration["Data:BahamutDBConnection:connectionString"];
             var svrControlDbConString = Configuration["Data:ServerControlDBConnection:connectionString"];
-            IRedisServerConfig controlRedisServerConfig = new RedisServerConfig()
-            {
-                Db = long.Parse(Configuration["Data:ControlServiceServer:Db"]),
-                Host = Configuration["Data:ControlServiceServer:Host"],
-                Password = Configuration["Data:ControlServiceServer:Password"],
-                Port = int.Parse(Configuration["Data:ControlServiceServer:Port"])
-            };
-
-            IRedisServerConfig tokenRedisServerConfig = new RedisServerConfig()
-            {
-                Db = long.Parse(Configuration["Data:TokenServer:Db"]),
-                Host = Configuration["Data:TokenServer:Host"],
-                Password = Configuration["Data:TokenServer:Password"],
-                Port = int.Parse(Configuration["Data:TokenServer:Port"])
-            };
+            TokenServerClientManager = new RedisManagerPool(Configuration["Data:TokenServer:url"]);
+            ControlServerServiceClientManager = new RedisManagerPool(Configuration["Data:ControlServiceServer:url"]);
             services.AddInstance(new AuthenticationService(bahamutDbConString));
             services.AddInstance(new BahamutAccountService(bahamutDbConString));
             services.AddInstance(new BahamutAppService(bahamutDbConString));
-            services.AddInstance(new ServerControlManagementService(controlRedisServerConfig));
-            services.AddInstance(new TokenService(tokenRedisServerConfig));
+            services.AddInstance(new ServerControlManagementService(ControlServerServiceClientManager));
+            services.AddInstance(new TokenService(TokenServerClientManager));
             // Uncomment the following line to add Web API services which makes it easier to port Web API 2 controllers.
             // You will also need to add the Microsoft.AspNet.Mvc.WebApiCompatShim package to the 'dependencies' section of project.json.
             // services.AddWebApiConventions();
@@ -68,6 +59,7 @@ namespace AuthenticationServer
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             ServicesProvider = app.ApplicationServices;
+            TokenServerClientManager = new RedisManagerPool(Configuration["Data:TokenServer:url"]);
 
             loggerFactory.MinimumLevel = LogLevel.Information;
             loggerFactory.AddConsole();
