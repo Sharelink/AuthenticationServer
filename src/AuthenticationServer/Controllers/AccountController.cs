@@ -106,8 +106,9 @@ namespace AuthenticationServer.Controllers
                     ModelState.AddModelError(string.Empty, ex.Message);
                     return PartialView(model);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Console.WriteLine(ex.Message);
                     ModelState.AddModelError(string.Empty, "Server Error");
                     return PartialView(model);
                 }
