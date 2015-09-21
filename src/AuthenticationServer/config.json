@@ -5,14 +5,14 @@
       "appkey": "e1c91545bdb803aaeba2f5d4c86308327b93a2e2"
     },
     "BahamutDBConnection": {
-      "connectionString": "server=192.168.0.23;user id=root;password=dfyybest;persistsecurityinfo=True;database=BahamutDB;Pooling=true; Max Pool Size=50;"
+      "connectionString": "server=192.168.1.23;user id=root;password=dfyybest;persistsecurityinfo=True;database=BahamutDB;Pooling=true; Max Pool Size=50;"
     },
     "TokenServer": {
-      "url": "redis://192.168.0.23:6379"
+      "url": "redis://192.168.1.23:6379"
     },
 
     "ControlServiceServer": {
-      "url": "redis://192.168.0.23:6379"
+      "url": "redis://192.168.1.23:6379"
     }
   }
 }
