@@ -34,9 +34,24 @@ namespace AuthenticationServer.Controllers
             return PartialView();
         }
 
+        [HttpGet]
         public IActionResult Regist(string appkey)
         {
             return RedirectToAction("RegistReturns", new { AccountID = "147258", FinishRegist = "Yes" });
+        }
+
+        [HttpGet]
+        public string UserNameExists(string username)
+        {
+            var accountService = Startup.ServicesProvider.GetBahamutAccountService();
+            if (accountService.AccountExists(username))
+            {
+                return "true";
+            }
+            else
+            {
+                return "false";
+            }
         }
 
         //
