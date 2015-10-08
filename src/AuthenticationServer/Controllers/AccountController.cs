@@ -40,6 +40,25 @@ namespace AuthenticationServer.Controllers
             return RedirectToAction("RegistReturns", new { AccountID = "147258", FinishRegist = "Yes" });
         }
 
+        [HttpPost]
+        public IActionResult AjaxRegist(string username,string password,string phone_number,string email, string appkey)
+        {
+            var aService = Startup.ServicesProvider.GetBahamutAccountService();
+            if (aService.AccountExists(username))
+            {
+                return Json(new { suc = false, msg = "user name already exists" });
+            }
+            var accountId = aService.AddAccount(new Account()
+            {
+                AccountName = username,
+                CreateTime = DateTime.Now,
+                Email = email,
+                Mobile = phone_number,
+                Password = password
+            });
+            return Json(new { suc = true, accountId = accountId });
+        }
+
         [HttpGet]
         public string UserNameExists(string username)
         {
@@ -64,6 +83,55 @@ namespace AuthenticationServer.Controllers
             ViewData["Scopes"] = scopes;
             ViewData["ReturnUrl"] = returnUrl;
             return PartialView();
+        }
+
+        [HttpPost]
+        public IActionResult AjaxLogin(string username,string password,string appkey)
+        {
+            var authService = Startup.ServicesProvider.GetAuthenticationService();
+            try
+            {
+                var result = authService.LoginValidate(username, password);
+                if (result.Succeeded)
+                {
+                    var svrCtrlService = Startup.ServicesProvider.GetServerControlManagementService();
+                    var appInstance = svrCtrlService.GetMostFreeAppInstance(appkey);
+                    var tokenService = Startup.ServicesProvider.GetTokenService();
+                    var newSessionData = new AccountSessionData()
+                    {
+                        AccountId = result.AccountID,
+                        Appkey = appkey
+                    };
+                    var atokenResult = tokenService.AllocateAccessToken(newSessionData).Result;
+                    if (atokenResult == null)
+                    {
+                        throw new Exception("AllocateAccessToken Failed");
+                    }
+                    var parameters = new
+                    {
+                        LoginSuccessed = "true",
+                        AccountID = result.AccountID,
+                        AccessToken = atokenResult.AccessToken,
+                        AppServerIP = appInstance.InstanceEndPointIP,
+                        AppServerPort = appInstance.InstanceEndPointPort,
+                        AppServiceUrl = appInstance.InstanceServiceUrl
+                    };
+                    return Json(parameters);
+                }
+            }
+            catch (NoAppInstanceException)
+            {
+                return Json(new { msg = "No App Instance" });
+            }
+            catch (NullReferenceException ex)
+            {
+                return Json(new { msg = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { msg = ex.Message });
+            }
+            return Json(new {});
         }
 
         //
