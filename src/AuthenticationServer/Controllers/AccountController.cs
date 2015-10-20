@@ -51,7 +51,7 @@ namespace AuthenticationServer.Controllers
             var accountId = aService.AddAccount(new Account()
             {
                 AccountName = username,
-                CreateTime = DateTime.Now,
+                CreateTime = DateTime.UtcNow,
                 Email = email,
                 Mobile = phone_number,
                 Password = password
