@@ -1,2 +1,2 @@
-dnx web --server.urls http://192.168.1.67:8088
+dnx web --server.urls http://auth.sharelink.online:8086
 pause
