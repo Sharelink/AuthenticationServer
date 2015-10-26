@@ -9,15 +9,28 @@ using ServerControlService.Service;
 using DataLevelDefines;
 using Microsoft.Dnx.Runtime;
 using ServiceStack.Redis;
+using BahamutService.Model;
 
 namespace AuthenticationServer
 {
 
     public class Startup
     {
+
+        public IConfiguration Configuration { get; private set; }
+        public static IServiceProvider ServicesProvider { get; private set; }
+        public static string Appkey { get; private set; }
+        public static string Appname { get; private set; }
+        public static IRedisClientsManager TokenServerClientManager { get; private set; }
+        public static IRedisClientsManager ControlServerServiceClientManager { get; private set; }
+        public static IHostingEnvironment HostingEnvironment { get; private set; }
+        public static IApplicationEnvironment AppEnvironment { get; private set; }
+
         public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
         {
             // Setup configuration sources.
+            HostingEnvironment = env;
+            AppEnvironment = appEnv;
             var builder = new ConfigurationBuilder()
                 .SetBasePath(appEnv.ApplicationBasePath)
                 .AddJsonFile("config.json")
@@ -28,13 +41,6 @@ namespace AuthenticationServer
 
         }
 
-        public IConfiguration Configuration { get; private set; }
-        public static IServiceProvider ServicesProvider { get;private set; }
-        public static string Appkey { get; private set; }
-        public static string Appname { get; private set; }
-        public static IRedisClientsManager TokenServerClientManager { get; private set; }
-        public static IRedisClientsManager ControlServerServiceClientManager { get; private set; }
-
         // This method gets called by the runtime.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -42,6 +48,10 @@ namespace AuthenticationServer
             services.AddMvc();
 
             var bahamutDbConString = Configuration["Data:BahamutDBConnection:connectionString"];
+            bahamutDbConString = HostingEnvironment.IsDevelopment() ? 
+                string.Format(bahamutDbConString, "root", "dfyybest") :
+                string.Format(bahamutDbConString, "root", "sharelinkbest");
+
             var svrControlDbConString = Configuration["Data:ServerControlDBConnection:connectionString"];
             TokenServerClientManager = new RedisManagerPool(Configuration["Data:TokenServer:url"]);
             ControlServerServiceClientManager = new RedisManagerPool(Configuration["Data:ControlServiceServer:url"]);
@@ -50,6 +60,7 @@ namespace AuthenticationServer
             services.AddInstance(new BahamutAppService(bahamutDbConString));
             services.AddInstance(new ServerControlManagementService(ControlServerServiceClientManager));
             services.AddInstance(new TokenService(TokenServerClientManager));
+
             // Uncomment the following line to add Web API services which makes it easier to port Web API 2 controllers.
             // You will also need to add the Microsoft.AspNet.Mvc.WebApiCompatShim package to the 'dependencies' section of project.json.
             // services.AddWebApiConventions();
