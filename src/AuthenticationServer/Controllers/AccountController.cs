@@ -50,7 +50,7 @@ namespace AuthenticationServer.Controllers
                 Mobile = phone_number,
                 Password = password
             });
-            return Json(new { suc = true, accountId = accountId });
+            return Json(new { suc = true, accountId = accountId, accountName = username });
         }
 
         [HttpGet]
@@ -68,7 +68,7 @@ namespace AuthenticationServer.Controllers
         }
 
         [HttpPost]
-        public IActionResult AjaxLogin(string username,string password,string appkey)
+        public async Task<IActionResult> AjaxLogin(string username, string password, string appkey)
         {
             var authService = Startup.ServicesProvider.GetAuthenticationService();
             try
@@ -84,7 +84,7 @@ namespace AuthenticationServer.Controllers
                         AccountId = result.AccountID,
                         Appkey = appkey
                     };
-                    var atokenResult = tokenService.AllocateAccessToken(newSessionData).Result;
+                    var atokenResult = await tokenService.AllocateAccessToken(newSessionData);
                     if (atokenResult == null)
                     {
                         throw new Exception("AllocateAccessToken Failed");
@@ -113,7 +113,7 @@ namespace AuthenticationServer.Controllers
             {
                 return Json(new { msg = ex.Message });
             }
-            return Json(new {});
+            return Json(new { });
         }
     }
 }
