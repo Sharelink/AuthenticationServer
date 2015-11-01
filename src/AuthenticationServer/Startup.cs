@@ -6,7 +6,6 @@ using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using BahamutService;
 using ServerControlService.Service;
-using DataLevelDefines;
 using Microsoft.Dnx.Runtime;
 using ServiceStack.Redis;
 using BahamutService.Model;
