@@ -39,7 +39,7 @@ namespace AuthenticationServer.Controllers
             var aService = Startup.ServicesProvider.GetBahamutAccountService();
             if (aService.AccountExists(username))
             {
-                return Json(new { suc = false, msg = "user name already exists" });
+                return Json(new { suc = false, msg = "USER_NAME_EXISTS" });
             }
             var accountId = aService.AddAccount(new Account()
             {
@@ -86,7 +86,7 @@ namespace AuthenticationServer.Controllers
                     var atokenResult = await tokenService.AllocateAccessToken(newSessionData);
                     if (atokenResult == null)
                     {
-                        throw new Exception("AllocateAccessToken Failed");
+                        return Json(new { msg = "ALLOC_TOKEN_FAILED" });
                     }
                     var parameters = new
                     {
@@ -102,17 +102,17 @@ namespace AuthenticationServer.Controllers
             }
             catch (NoAppInstanceException)
             {
-                return Json(new { msg = "No App Instance" });
+                return Json(new { msg = "NO_APP_INSTANCE" });
             }
             catch (NullReferenceException ex)
             {
                 return Json(new { msg = ex.Message });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return Json(new { msg = ex.Message });
+                return Json(new { msg = "SERVER_ERROR" });
             }
-            return Json(new { });
+            return Json(new { msg = "SERVER_ERROR" });
         }
     }
 }
