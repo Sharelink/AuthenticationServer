@@ -30,10 +30,16 @@ namespace AuthenticationServer
             // Setup configuration sources.
             HostingEnvironment = env;
             AppEnvironment = appEnv;
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(appEnv.ApplicationBasePath)
-                .AddJsonFile("config.json")
-                .AddEnvironmentVariables();
+            var builder = new ConfigurationBuilder().SetBasePath(appEnv.ApplicationBasePath);
+            if (env.IsDevelopment())
+            {
+                builder.AddJsonFile("config_debug.json");
+            }
+            else
+            {
+                builder.AddJsonFile("config.json");
+            }
+            builder.AddEnvironmentVariables();
             Configuration = builder.Build();
             Appkey = Configuration["Data:App:appkey"];
             Appname = Configuration["Data:App:appname"];
@@ -47,9 +53,6 @@ namespace AuthenticationServer
             services.AddMvc();
 
             var bahamutDbConString = Configuration["Data:BahamutDBConnection:connectionString"];
-            bahamutDbConString = HostingEnvironment.IsDevelopment() ? 
-                string.Format(bahamutDbConString, "root", "dfyybest") :
-                string.Format(bahamutDbConString, "root", "sharelinkbest");
 
             var svrControlDbConString = Configuration["Data:ServerControlDBConnection:connectionString"];
             TokenServerClientManager = new RedisManagerPool(Configuration["Data:TokenServer:url"]);

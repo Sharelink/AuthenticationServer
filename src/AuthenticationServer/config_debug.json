@@ -1,0 +1,19 @@
+{
+  "Data": {
+    "App": {
+      "appname": "AuthenticationServer",
+      "appkey": "e1c91545bdb803aaeba2f5d4c86308327b93a2e2",
+      "url": "http://auth.sharelink.online:8086"
+    },
+    "BahamutDBConnection": {
+      "connectionString": "server=bahamutdb.sharelink.online;user id=root;password=dfyybest;persistsecurityinfo=False;database=BahamutDB;Pooling=true; Max Pool Size=50;"
+    },
+    "TokenServer": {
+      "url": "redis://token.sharelink.online:6379"
+    },
+
+    "ControlServiceServer": {
+      "url": "redis://app.sharelink.online:6379"
+    }
+  }
+}
