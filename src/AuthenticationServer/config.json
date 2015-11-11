@@ -14,6 +14,10 @@
 
     "ControlServiceServer": {
       "url": "redis://app.sharelink.online:6379"
+    },
+
+    "Log": {
+      "logFile": "/home/deployment/logs/AuthenticationServer/8086.log"
     }
   }
 }

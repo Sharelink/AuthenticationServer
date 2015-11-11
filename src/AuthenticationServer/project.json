@@ -13,7 +13,6 @@
     "Microsoft.Framework.Configuration.EnvironmentVariables": "1.0.0-*",
     "ServerControlService": "1.0.0-*",
     "BahamutService": "1.0.0-*",
-    "Microsoft.Framework.Logging.Console": "1.0.0-*",
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0-*"
   },
 

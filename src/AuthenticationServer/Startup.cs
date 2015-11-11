@@ -9,10 +9,12 @@ using ServerControlService.Service;
 using Microsoft.Dnx.Runtime;
 using ServiceStack.Redis;
 using BahamutService.Model;
+using NLog;
+using NLog.Config;
 
 namespace AuthenticationServer
 {
-
+    
     public class Startup
     {
 
@@ -55,8 +57,12 @@ namespace AuthenticationServer
             var bahamutDbConString = Configuration["Data:BahamutDBConnection:connectionString"];
 
             var svrControlDbConString = Configuration["Data:ServerControlDBConnection:connectionString"];
-            TokenServerClientManager = new RedisManagerPool(Configuration["Data:TokenServer:url"]);
-            ControlServerServiceClientManager = new RedisManagerPool(Configuration["Data:ControlServiceServer:url"]);
+
+            var tokenServerUrl = Configuration["Data:TokenServer:url"].Replace("redis://", "");
+            TokenServerClientManager = new PooledRedisClientManager(tokenServerUrl);
+
+            var serverControlUrl = Configuration["Data:ControlServiceServer:url"].Replace("redis://", "");
+            ControlServerServiceClientManager = new PooledRedisClientManager(serverControlUrl);
             services.AddInstance(new AuthenticationService(bahamutDbConString));
             services.AddInstance(new BahamutAccountService(bahamutDbConString));
             services.AddInstance(new BahamutAppService(bahamutDbConString));
@@ -70,18 +76,30 @@ namespace AuthenticationServer
         }
 
         // Configure is called after ConfigureServices is called.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             ServicesProvider = app.ApplicationServices;
-            TokenServerClientManager = new RedisManagerPool(Configuration["Data:TokenServer:url"]);
-
-            loggerFactory.MinimumLevel = LogLevel.Information;
-            loggerFactory.AddConsole();
             // Configure the HTTP request pipeline.
+
+            //Log
+            var logConfig = new LoggingConfiguration();
+            var fileTarget = new NLog.Targets.FileTarget();
+            fileTarget.FileName = Configuration["Data:Log:logFile"];
+            fileTarget.Name = "FileLogger";
+            fileTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger}:${message}";
+            logConfig.AddTarget(fileTarget);
+            logConfig.LoggingRules.Add(new LoggingRule("*", NLog.LogLevel.Debug, fileTarget));
+            LogManager.Configuration = logConfig;
 
             // Add the following to the request pipeline only in development environment.
             if (env.IsDevelopment())
             {
+                var consoleLogger = new NLog.Targets.ColoredConsoleTarget();
+                consoleLogger.Name = "ConsoleLogger";
+                consoleLogger.Layout = @"${date:format=HH\:mm\:ss} ${logger}:${message}";
+                logConfig.AddTarget(consoleLogger);
+                logConfig.LoggingRules.Add(new LoggingRule("*", NLog.LogLevel.Debug, consoleLogger));
+
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
             }
@@ -105,7 +123,8 @@ namespace AuthenticationServer
                 // Uncomment the following line to add a route for porting Web API 2 controllers.
                 // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
             });
-            
+
+            LogManager.GetCurrentClassLogger().Info("Server Started!");
         }
 
     }

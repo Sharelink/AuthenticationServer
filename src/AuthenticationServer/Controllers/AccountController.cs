@@ -6,6 +6,7 @@ using BahamutService.Model;
 using ServerControlService.Service;
 using System;
 using BahamutCommon;
+using NLog;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -39,6 +40,7 @@ namespace AuthenticationServer.Controllers
             var aService = Startup.ServicesProvider.GetBahamutAccountService();
             if (aService.AccountExists(username))
             {
+                LogManager.GetCurrentClassLogger().Warn("AjaxRegist:UserNameExists:{0}", username);
                 return Json(new { suc = false, msg = "USER_NAME_EXISTS" });
             }
             var accountId = aService.AddAccount(new Account()
@@ -49,6 +51,7 @@ namespace AuthenticationServer.Controllers
                 Mobile = phone_number,
                 Password = password
             });
+            LogManager.GetCurrentClassLogger().Info("AjaxRegist:{0}", username);
             return Json(new { suc = true, accountId = accountId, accountName = username });
         }
 
@@ -86,6 +89,7 @@ namespace AuthenticationServer.Controllers
                     var atokenResult = await tokenService.AllocateAccessToken(newSessionData);
                     if (atokenResult == null)
                     {
+                        LogManager.GetCurrentClassLogger().Warn("AjaxLogin:Allocate Access Token Failed");
                         return Json(new { msg = "ALLOC_TOKEN_FAILED" });
                     }
                     var parameters = new
@@ -100,18 +104,22 @@ namespace AuthenticationServer.Controllers
                     return Json(parameters);
                 }
             }
-            catch (NoAppInstanceException)
+            catch (NoAppInstanceException ex)
             {
+                LogManager.GetCurrentClassLogger().Warn(ex, "AjaxLogin:No App Server Instance");
                 return Json(new { msg = "NO_APP_INSTANCE" });
             }
             catch (NullReferenceException ex)
             {
+                LogManager.GetCurrentClassLogger().Warn(ex, "AjaxLogin");
                 return Json(new { msg = ex.Message });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                LogManager.GetCurrentClassLogger().Error(ex, "AjaxLogin:Server Error");
                 return Json(new { msg = "SERVER_ERROR" });
             }
+            LogManager.GetCurrentClassLogger().Error("AjaxLogin:Server Error");
             return Json(new { msg = "SERVER_ERROR" });
         }
     }
