@@ -86,20 +86,22 @@ namespace AuthenticationServer
             var fileTarget = new NLog.Targets.FileTarget();
             fileTarget.FileName = Configuration["Data:Log:logFile"];
             fileTarget.Name = "FileLogger";
-            fileTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger}:${message}";
+            fileTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger}:${message};${exception}";
             logConfig.AddTarget(fileTarget);
             logConfig.LoggingRules.Add(new LoggingRule("*", NLog.LogLevel.Debug, fileTarget));
+            if (env.IsDevelopment())
+            {
+                var consoleLogger = new NLog.Targets.ColoredConsoleTarget();
+                consoleLogger.Name = "ConsoleLogger";
+                consoleLogger.Layout = @"${date:format=HH\:mm\:ss} ${logger}:${message};${exception}";
+                logConfig.AddTarget(consoleLogger);
+                logConfig.LoggingRules.Add(new LoggingRule("*", NLog.LogLevel.Debug, consoleLogger));
+            }
             LogManager.Configuration = logConfig;
 
             // Add the following to the request pipeline only in development environment.
             if (env.IsDevelopment())
             {
-                var consoleLogger = new NLog.Targets.ColoredConsoleTarget();
-                consoleLogger.Name = "ConsoleLogger";
-                consoleLogger.Layout = @"${date:format=HH\:mm\:ss} ${logger}:${message}";
-                logConfig.AddTarget(consoleLogger);
-                logConfig.LoggingRules.Add(new LoggingRule("*", NLog.LogLevel.Debug, consoleLogger));
-
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
             }
@@ -109,7 +111,6 @@ namespace AuthenticationServer
                 // send the request to the following path or controller action.
                 app.UseExceptionHandler("/Home/Error");
             }
-
             // Add static files to the request pipeline.
             app.UseStaticFiles();
 
