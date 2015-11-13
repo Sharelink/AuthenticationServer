@@ -219,3 +219,4 @@ FakesAssemblies/
 **/*.Server/ModelManifest.xml
 _Pvt_Extensions
 src/AuthenticationServer/hosting.ini
+src/AuthenticationServer/config_debug.json
