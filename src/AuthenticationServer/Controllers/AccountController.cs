@@ -38,11 +38,21 @@ namespace AuthenticationServer.Controllers
         public IActionResult AjaxRegist(string username,string password,string phone_number,string email, string appkey)
         {
             var aService = Startup.ServicesProvider.GetBahamutAccountService();
-            if (aService.AccountExists(username))
+            try
             {
-                LogManager.GetCurrentClassLogger().Warn("AjaxRegist:UserNameExists:{0}", username);
-                return Json(new { suc = false, msg = "USER_NAME_EXISTS" });
+                if (aService.AccountExists(username))
+                {
+                    LogManager.GetCurrentClassLogger().Warn("AjaxRegist:UserNameExists:{0}", username);
+                    return Json(new { suc = false, msg = "USER_NAME_EXISTS" });
+                }
             }
+            catch (Exception ex)
+            {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
+                LogManager.GetCurrentClassLogger().Error(ex, "AjaxRegist:Server Error");
+                return Json(new { suc = false, msg = "SERVER_ERROR" });
+            }
+            
             var accountId = aService.AddAccount(new Account()
             {
                 AccountName = username,
@@ -59,14 +69,24 @@ namespace AuthenticationServer.Controllers
         public string UserNameExists(string username)
         {
             var accountService = Startup.ServicesProvider.GetBahamutAccountService();
-            if (accountService.AccountExists(username))
+            try
             {
-                return "true";
+                if (accountService.AccountExists(username))
+                {
+                    return "true";
+                }
+                else
+                {
+                    return "false";
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return "false";
+                Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
+                LogManager.GetCurrentClassLogger().Error(ex, "UserNameExists:Server Error");
+                return "SERVER_ERROR";
             }
+            
         }
 
         [HttpPost]
