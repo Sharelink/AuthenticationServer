@@ -1,9 +1,8 @@
 ﻿using System;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
-using Microsoft.Framework.Configuration;
-using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using BahamutService;
 using ServerControlService.Service;
 using Microsoft.Dnx.Runtime;
@@ -11,6 +10,8 @@ using ServiceStack.Redis;
 using BahamutService.Model;
 using NLog;
 using NLog.Config;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace AuthenticationServer
 {
@@ -128,6 +129,8 @@ namespace AuthenticationServer
             LogManager.GetCurrentClassLogger().Info("Server Started!");
         }
 
+        // Entry point for the application.
+        public static void Main(string[] args) => WebApplication.Run<Startup>(args);
     }
 
     public static class IGetServerControlService
