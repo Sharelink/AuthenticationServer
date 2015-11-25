@@ -2,12 +2,9 @@
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using BahamutService;
 using ServerControlService.Service;
-using Microsoft.Dnx.Runtime;
 using ServiceStack.Redis;
-using BahamutService.Model;
 using NLog;
 using NLog.Config;
 using Microsoft.Extensions.Configuration;
@@ -100,18 +97,6 @@ namespace AuthenticationServer
             }
             LogManager.Configuration = logConfig;
 
-            // Add the following to the request pipeline only in development environment.
-            if (env.IsDevelopment())
-            {
-                app.UseBrowserLink();
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                // Add Error handling middleware which catches all application specific errors and
-                // send the request to the following path or controller action.
-                app.UseExceptionHandler("/Home/Error");
-            }
             // Add static files to the request pipeline.
             app.UseStaticFiles();
 
