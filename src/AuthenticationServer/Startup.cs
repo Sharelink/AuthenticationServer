@@ -25,19 +25,20 @@ namespace AuthenticationServer
         public static IHostingEnvironment HostingEnvironment { get; private set; }
         public static IApplicationEnvironment AppEnvironment { get; private set; }
 
-        public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
+        public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv, object[] args)
         {
             // Setup configuration sources.
             HostingEnvironment = env;
             AppEnvironment = appEnv;
             var builder = new ConfigurationBuilder().SetBasePath(appEnv.ApplicationBasePath);
+            
             if (env.IsDevelopment())
             {
                 builder.AddJsonFile("config_debug.json");
             }
             else
             {
-                builder.AddJsonFile("config.json");
+                builder.AddJsonFile("/etc/bahamut/auth.json");
             }
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
@@ -66,10 +67,6 @@ namespace AuthenticationServer
             services.AddInstance(new BahamutAppService(bahamutDbConString));
             services.AddInstance(new ServerControlManagementService(ControlServerServiceClientManager));
             services.AddInstance(new TokenService(TokenServerClientManager));
-
-            // Uncomment the following line to add Web API services which makes it easier to port Web API 2 controllers.
-            // You will also need to add the Microsoft.AspNet.Mvc.WebApiCompatShim package to the 'dependencies' section of project.json.
-            // services.AddWebApiConventions();
 
         }
 
@@ -113,9 +110,6 @@ namespace AuthenticationServer
 
             LogManager.GetCurrentClassLogger().Info("Server Started!");
         }
-
-        // Entry point for the application.
-        public static void Main(string[] args) => WebApplication.Run<Startup>(args);
     }
 
     public static class IGetServerControlService
