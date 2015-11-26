@@ -25,7 +25,7 @@ namespace AuthenticationServer
         public static IHostingEnvironment HostingEnvironment { get; private set; }
         public static IApplicationEnvironment AppEnvironment { get; private set; }
 
-        public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv, object[] args)
+        public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
         {
             // Setup configuration sources.
             HostingEnvironment = env;
