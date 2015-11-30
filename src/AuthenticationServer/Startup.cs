@@ -51,7 +51,9 @@ namespace AuthenticationServer
         public void ConfigureServices(IServiceCollection services)
         {
             // Add MVC services to the services container.
-            services.AddMvc();
+            services.AddMvc(config => {
+                config.Filters.Add(new LogExceptionFilter());
+            });
 
             var bahamutDbConString = Configuration["Data:BahamutDBConnection:connectionString"];
 
@@ -81,14 +83,14 @@ namespace AuthenticationServer
             var fileTarget = new NLog.Targets.FileTarget();
             fileTarget.FileName = Configuration["Data:Log:logFile"];
             fileTarget.Name = "FileLogger";
-            fileTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger}:${message};${exception}";
+            fileTarget.Layout = @"${date:format=yyyy-MM-dd HH\:mm\:ss} ${logger}:${message};${exception}";
             logConfig.AddTarget(fileTarget);
             logConfig.LoggingRules.Add(new LoggingRule("*", NLog.LogLevel.Debug, fileTarget));
             if (env.IsDevelopment())
             {
                 var consoleLogger = new NLog.Targets.ColoredConsoleTarget();
                 consoleLogger.Name = "ConsoleLogger";
-                consoleLogger.Layout = @"${date:format=HH\:mm\:ss} ${logger}:${message};${exception}";
+                consoleLogger.Layout = @"${date:format=yyyy-MM-dd HH\:mm\:ss} ${logger}:${message};${exception}";
                 logConfig.AddTarget(consoleLogger);
                 logConfig.LoggingRules.Add(new LoggingRule("*", NLog.LogLevel.Debug, consoleLogger));
             }
