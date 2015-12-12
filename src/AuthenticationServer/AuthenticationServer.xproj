@@ -16,4 +16,9 @@
     <DevelopmentServerPort>59576</DevelopmentServerPort>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.targets" Condition="'$(VSToolsPath)' != ''" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties config_1json__JSONSchema="http://json-schema.org/draft-04/schema" config_3debug_1json__JSONSchema="http://json-schema.org/draft-04/schema" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

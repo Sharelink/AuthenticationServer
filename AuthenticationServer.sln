@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{92EFAADD-336A-4688-9F66-85194584B45E}"
 EndProject
@@ -19,6 +19,8 @@ EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "DataLevelDefines", "..\BahamutZero\src\DataLevelDefines\DataLevelDefines.xproj", "{066F24F1-F532-4C3D-8AED-91F9AD1D5615}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ServerControlService", "..\ServerControl\src\ServerControlService\ServerControlService.xproj", "{FBA78BE4-EF95-4BA8-BBD5-D78EB85652B6}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BahamutAspNetCommon", "..\BahamutZero\src\BahamutAspNetCommon\BahamutAspNetCommon.xproj", "{5F349C91-31A8-4A03-AC83-4F0783A78EEA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +48,10 @@ Global
 		{FBA78BE4-EF95-4BA8-BBD5-D78EB85652B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBA78BE4-EF95-4BA8-BBD5-D78EB85652B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBA78BE4-EF95-4BA8-BBD5-D78EB85652B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F349C91-31A8-4A03-AC83-4F0783A78EEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F349C91-31A8-4A03-AC83-4F0783A78EEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F349C91-31A8-4A03-AC83-4F0783A78EEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F349C91-31A8-4A03-AC83-4F0783A78EEA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -56,5 +62,6 @@ Global
 		{2EF2E209-4289-46A9-BCA5-6555CB39BF68} = {B6EC5823-8946-434F-8C64-9A92544F93CA}
 		{066F24F1-F532-4C3D-8AED-91F9AD1D5615} = {B6EC5823-8946-434F-8C64-9A92544F93CA}
 		{FBA78BE4-EF95-4BA8-BBD5-D78EB85652B6} = {B6EC5823-8946-434F-8C64-9A92544F93CA}
+		{5F349C91-31A8-4A03-AC83-4F0783A78EEA} = {B6EC5823-8946-434F-8C64-9A92544F93CA}
 	EndGlobalSection
 EndGlobal

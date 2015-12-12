@@ -8,7 +8,7 @@
     "Microsoft.AspNet.StaticFiles": "1.0.0-*",
     "Microsoft.Extensions.Configuration.Json": "1.0.0-*",
     "ServerControlService": "1.0.0-*",
-    "BahamutService": "1.0.0-*"
+    "BahamutAspNetCommon": "1.0.0-*"
   },
 
   "commands": {

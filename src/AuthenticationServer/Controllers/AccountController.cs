@@ -61,7 +61,7 @@ namespace AuthenticationServer.Controllers
                 Mobile = phone_number,
                 Password = password
             });
-            LogManager.GetCurrentClassLogger().Info("AjaxRegist:{0}", username);
+            LogManager.GetLogger("Info").Info("AjaxRegist:{0}", username);
             return Json(new { suc = true, accountId = accountId, accountName = username });
         }
 
@@ -126,12 +126,12 @@ namespace AuthenticationServer.Controllers
             }
             catch (NoAppInstanceException ex)
             {
-                LogManager.GetCurrentClassLogger().Warn(ex, "AjaxLogin:No App Server Instance");
+                LogManager.GetLogger("Main").Error(ex, "AjaxLogin:No App Server Instance");
                 return Json(new { msg = "NO_APP_INSTANCE" });
             }
             catch (NullReferenceException ex)
             {
-                LogManager.GetCurrentClassLogger().Warn(ex, "AjaxLogin");
+                LogManager.GetCurrentClassLogger().Warn(ex, "AjaxLogin->{0}", ex.Message);
                 return Json(new { msg = ex.Message });
             }
             catch (Exception ex)

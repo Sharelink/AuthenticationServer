@@ -9,6 +9,8 @@ using NLog;
 using NLog.Config;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.PlatformAbstractions;
+using BahamutCommon;
+using BahamutAspNetCommon;
 
 namespace AuthenticationServer
 {
@@ -80,19 +82,11 @@ namespace AuthenticationServer
 
             //Log
             var logConfig = new LoggingConfiguration();
-            var fileTarget = new NLog.Targets.FileTarget();
-            fileTarget.FileName = Configuration["Data:Log:logFile"];
-            fileTarget.Name = "FileLogger";
-            fileTarget.Layout = @"${date:format=yyyy-MM-dd HH\:mm\:ss} ${logger}:${message};${exception}";
-            logConfig.AddTarget(fileTarget);
-            logConfig.LoggingRules.Add(new LoggingRule("*", NLog.LogLevel.Debug, fileTarget));
+            LoggerLoaderHelper.LoadLoggerToLoggingConfig(logConfig, Configuration, "Data:Log:fileLoggers");
+
             if (env.IsDevelopment())
             {
-                var consoleLogger = new NLog.Targets.ColoredConsoleTarget();
-                consoleLogger.Name = "ConsoleLogger";
-                consoleLogger.Layout = @"${date:format=yyyy-MM-dd HH\:mm\:ss} ${logger}:${message};${exception}";
-                logConfig.AddTarget(consoleLogger);
-                logConfig.LoggingRules.Add(new LoggingRule("*", NLog.LogLevel.Debug, consoleLogger));
+                LoggerLoaderHelper.AddConsoleLoggerToLogginConfig(logConfig);
             }
             LogManager.Configuration = logConfig;
 
@@ -110,7 +104,7 @@ namespace AuthenticationServer
                 // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
             });
 
-            LogManager.GetCurrentClassLogger().Info("Server Started!");
+            LogManager.GetLogger("Main").Info("Server Started!");
         }
     }
 
