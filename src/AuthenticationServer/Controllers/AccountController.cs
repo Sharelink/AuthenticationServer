@@ -116,6 +116,7 @@ namespace AuthenticationServer.Controllers
                     {
                         LoginSuccessed = "true",
                         AccountID = result.AccountID,
+                        AccountName = result.AccountName,
                         AccessToken = atokenResult.AccessToken,
                         AppServerIP = appInstance.InstanceEndPointIP,
                         AppServerPort = appInstance.InstanceEndPointPort,
