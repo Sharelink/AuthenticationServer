@@ -15,25 +15,6 @@ namespace AuthenticationServer.Controllers
     public class AccountController : Controller
     {
 
-        [HttpGet]
-        public IActionResult Returns(string AccountID,string AccessToken, string AppServerIP,int AppServerPort, string AppServiceUrl)
-        {
-            return Json(new
-            {
-                AccountID = AccountID,
-                AccessToken = AccessToken,
-                AppServerIP = AppServerIP,
-                AppServerPort = AppServerPort,
-                AppServiceUrl = AppServiceUrl
-            });
-        }
-
-        [HttpGet]
-        public IActionResult RegistReturns(string AccountID, string FinishRegist)
-        {
-            return PartialView();
-        }
-
         [HttpPost]
         public IActionResult AjaxRegist(string username,string password,string phone_number,string email, string appkey)
         {
@@ -117,6 +98,8 @@ namespace AuthenticationServer.Controllers
                         LoginSuccessed = "true",
                         AccountID = result.AccountID,
                         AccountName = result.AccountName,
+                        BindMobile = result.ValidatedMobile,
+                        BindEmail = result.ValidatedEmail,
                         AccessToken = atokenResult.AccessToken,
                         AppServerIP = appInstance.InstanceEndPointIP,
                         AppServerPort = appInstance.InstanceEndPointPort,
