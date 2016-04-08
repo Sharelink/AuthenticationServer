@@ -110,19 +110,23 @@ namespace AuthenticationServer.Controllers
             }
             catch (NoAppInstanceException ex)
             {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
                 LogManager.GetLogger("Main").Error(ex, "AjaxLogin:No App Server Instance");
                 return Json(new { msg = "NO_APP_INSTANCE" });
             }
             catch (NullReferenceException ex)
             {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
                 LogManager.GetCurrentClassLogger().Warn(ex, "AjaxLogin->{0}", ex.Message);
                 return Json(new { msg = ex.Message });
             }
             catch (Exception ex)
             {
+                Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
                 LogManager.GetCurrentClassLogger().Error(ex, "AjaxLogin:Server Error");
                 return Json(new { msg = "SERVER_ERROR" });
             }
+            Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
             LogManager.GetCurrentClassLogger().Error("AjaxLogin:Server Error");
             return Json(new { msg = "SERVER_ERROR" });
         }
