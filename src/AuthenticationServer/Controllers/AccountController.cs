@@ -90,6 +90,7 @@ namespace AuthenticationServer.Controllers
                     var atokenResult = await tokenService.AllocateAccessToken(newSessionData);
                     if (atokenResult == null)
                     {
+                        Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
                         LogManager.GetCurrentClassLogger().Warn("AjaxLogin:Allocate Access Token Failed");
                         return Json(new { msg = "ALLOC_TOKEN_FAILED" });
                     }
