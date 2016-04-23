@@ -1,13 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
-using AuthenticationServer.Models;
-using BahamutService;
 using BahamutService.Model;
 using ServerControlService.Service;
 using System;
-using BahamutCommon;
 using NLog;
-using System.Text.RegularExpressions;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -19,15 +15,6 @@ namespace AuthenticationServer.Controllers
         [HttpPost]
         public IActionResult AjaxRegist(string username,string password,string phone_number,string email, string appkey)
         {
-            if (!CheckUsernamePasswordIsValid(username, password))
-            {
-                Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
-                return Json(new
-                {
-                    suc = false,
-                    msg = "INVALID_PARAMETERS"
-                });
-            }
             var aService = Startup.ServicesProvider.GetBahamutAccountService();
             try
             {
@@ -54,11 +41,6 @@ namespace AuthenticationServer.Controllers
             });
             LogManager.GetLogger("Info").Info("AjaxRegist:{0}", username);
             return Json(new { suc = true, accountId = accountId, accountName = username });
-        }
-
-        private bool CheckUsernamePasswordIsValid(string username, string password)
-        {
-            return Regex.IsMatch(username, @"^[_a-zA-Z0-9\u4e00-\u9fa5]{2,23}$") && Regex.IsMatch(password, @"^[a-zA-Z0-9]{16,}$");
         }
 
         [HttpGet]
