@@ -116,5 +116,29 @@ namespace AuthenticationServer.Controllers
                 return new { msg = "TOKEN_UNAUTHORIZED" };
             }
         }
+
+        [HttpPut("AccountMobile")]
+        public async Task<object> ChangeMobile(string appkey, string appToken, string accountId, string userId, string newMobile)
+        {
+            var tokenService = Startup.ServicesProvider.GetTokenService();
+            var result = await tokenService.ValidateAppToken(appkey, userId, appToken);
+            if (result != null && result.AccountId == accountId)
+            {
+                var accountService = Startup.ServicesProvider.GetBahamutAccountService();
+
+                var suc = accountService.ChangeAccountMobile(accountId, newMobile);
+                if (suc == false)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.NotModified;
+                    return new { msg = "CHANGE_MOBILE_ERROR" };
+                }
+                return new { msg = "CHANGE_MOBILE_SUCCESS" };
+            }
+            else
+            {
+                Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                return new { msg = "TOKEN_UNAUTHORIZED" };
+            }
+        }
     }
 }
