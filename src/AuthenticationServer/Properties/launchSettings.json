@@ -15,12 +15,14 @@
         "ASPNET_ENV": "Development"
       }
     },
+
     "web": {
       "commandName": "web",
       "commandLineArgs": "--server.urls http://auth.sharelink.online:8086",
       "environmentVariables": {
-        "Hosting:Environment": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
+
   }
 }

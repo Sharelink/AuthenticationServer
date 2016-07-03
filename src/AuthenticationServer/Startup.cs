@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Hosting;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using BahamutService;
 using ServerControlService.Service;
@@ -8,13 +8,31 @@ using ServiceStack.Redis;
 using NLog;
 using NLog.Config;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.PlatformAbstractions;
 using BahamutCommon;
 using BahamutAspNetCommon;
+using System.IO;
 
 namespace AuthenticationServer
 {
-    
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var configuration = new ConfigurationBuilder()
+            .AddCommandLine(args)
+            .Build();
+
+            var host = new WebHostBuilder()
+                .UseKestrel()
+                .UseConfiguration(configuration)
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseStartup<Startup>()
+                .Build();
+
+            host.Run();
+        }
+    }
+
     public class Startup
     {
 
@@ -25,22 +43,20 @@ namespace AuthenticationServer
         public static IRedisClientsManager TokenServerClientManager { get; private set; }
         public static IRedisClientsManager ControlServerServiceClientManager { get; private set; }
         public static IHostingEnvironment HostingEnvironment { get; private set; }
-        public static IApplicationEnvironment AppEnvironment { get; private set; }
 
-        public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv)
+        public Startup(IHostingEnvironment env)
         {
             // Setup configuration sources.
             HostingEnvironment = env;
-            AppEnvironment = appEnv;
-            var builder = new ConfigurationBuilder().SetBasePath(appEnv.ApplicationBasePath);
+            var builder = new ConfigurationBuilder().SetBasePath(env.ContentRootPath);
             
             if (env.IsDevelopment())
             {
-                builder.AddJsonFile("config_debug.json");
+                builder.AddJsonFile("config_debug.json",true,true);
             }
             else
             {
-                builder.AddJsonFile("/etc/bahamut/auth.json");
+                builder.AddJsonFile("/etc/bahamut/auth.json", true, true);
             }
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
@@ -66,11 +82,11 @@ namespace AuthenticationServer
 
             var serverControlUrl = Configuration["Data:ControlServiceServer:url"].Replace("redis://", "");
             ControlServerServiceClientManager = new PooledRedisClientManager(serverControlUrl);
-            services.AddInstance(new AuthenticationService(bahamutDbConString));
-            services.AddInstance(new BahamutAccountService(bahamutDbConString));
-            services.AddInstance(new BahamutAppService(bahamutDbConString));
-            services.AddInstance(new ServerControlManagementService(ControlServerServiceClientManager));
-            services.AddInstance(new TokenService(TokenServerClientManager));
+            services.AddSingleton(new AuthenticationService(bahamutDbConString));
+            services.AddSingleton(new BahamutAccountService(bahamutDbConString));
+            services.AddSingleton(new BahamutAppService(bahamutDbConString));
+            services.AddSingleton(new ServerControlManagementService(ControlServerServiceClientManager));
+            services.AddSingleton(new TokenService(TokenServerClientManager));
 
         }
 

@@ -1,38 +1,37 @@
 {
-  "webroot": "wwwroot",
-  "version": "1.0.0-*",
 
   "dependencies": {
-    "Microsoft.AspNet.Server.Kestrel": "1.0.0-rc1-final",
-    "Microsoft.AspNet.Mvc": "6.0.0-rc1-final",
-    "Microsoft.AspNet.StaticFiles": "1.0.0-rc1-final",
-    "Microsoft.Extensions.Configuration.Json": "1.0.0-rc1-final",
+    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0",
+    "Microsoft.AspNetCore.Mvc": "1.0.0",
+    "Microsoft.AspNetCore.StaticFiles": "1.0.0",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0",
     "ServerControlService": "1.0.0-*",
-    "BahamutAspNetCommon": "1.0.0-*"
-  },
-
-  "commands": {
-    "web": "Microsoft.AspNet.Server.Kestrel"
+    "BahamutAspNetCommon": "1.0.0-*",
+    "Microsoft.Extensions.Configuration.CommandLine": "1.0.0"
   },
 
   "frameworks": {
-    "dnx451": {
-    }
+    "net451": {}
   },
 
-  "exclude": [
-    "wwwroot",
-    "node_modules",
-    "bower_components"
-  ],
-  "publishExclude": [
-    "node_modules",
-    "bower_components",
-    "**.xproj",
-    "**.user",
-    "**.vspscc"
-  ],
-  "scripts": {
-    "prepublish": [ "npm install", "bower install", "gulp clean", "gulp min" ]
-  }
+  "commands": {
+    "web": "Microsoft.AspNetCore.Server.Kestrel"
+  },
+
+  "buildOptions": {
+    "emitEntryPoint": true,
+    "preserveCompilationContext": true
+  },
+
+  "publishOptions": {
+    "include": [
+      "wwwroot",
+      "Views",
+      "Areas/**/Views",
+      "appsettings.json",
+      "web.config"
+    ]
+  },
+
+  "runtimes": { "ubuntu.14.04-x64": {} }
 }
