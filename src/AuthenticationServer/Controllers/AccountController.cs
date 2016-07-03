@@ -4,6 +4,7 @@ using BahamutService.Model;
 using ServerControlService.Service;
 using System;
 using NLog;
+using Newtonsoft.Json;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -93,15 +94,15 @@ namespace AuthenticationServer.Controllers
                     }
                     var parameters = new
                     {
-                        LoginSuccessed = "true",
-                        AccountID = result.AccountID,
-                        AccountName = result.AccountName,
-                        BindMobile = result.ValidatedMobile,
-                        BindEmail = result.ValidatedEmail,
-                        AccessToken = atokenResult.AccessToken,
-                        AppServerIP = appInstance.InstanceEndPointIP,
-                        AppServerPort = appInstance.InstanceEndPointPort,
-                        AppServiceUrl = appInstance.InstanceServiceUrl
+                        loginSuccessed = "true",
+                        accountID = result.AccountID,
+                        accountName = result.AccountName,
+                        bindMobile = result.ValidatedMobile,
+                        bindEmail = result.ValidatedEmail,
+                        accessToken = atokenResult.AccessToken,
+                        appServerIP = appInstance.InstanceEndPointIP,
+                        appServerPort = appInstance.InstanceEndPointPort,
+                        appServiceUrl = appInstance.InstanceServiceUrl
                     };
                     return Json(parameters);
                 }

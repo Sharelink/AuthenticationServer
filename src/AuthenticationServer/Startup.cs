@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using BahamutCommon;
 using BahamutAspNetCommon;
 using System.IO;
+using Newtonsoft.Json.Serialization;
 
 namespace AuthenticationServer
 {
@@ -69,8 +70,12 @@ namespace AuthenticationServer
         public void ConfigureServices(IServiceCollection services)
         {
             // Add MVC services to the services container.
-            services.AddMvc(config => {
+            services.AddMvc(config =>
+            {
                 config.Filters.Add(new LogExceptionFilter());
+            }).AddJsonOptions(op =>
+            {
+                op.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             });
 
             var bahamutDbConString = Configuration["Data:BahamutDBConnection:connectionString"];
