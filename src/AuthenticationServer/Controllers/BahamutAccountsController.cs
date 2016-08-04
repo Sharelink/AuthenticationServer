@@ -42,56 +42,36 @@ namespace AuthenticationServer.Controllers
 
         // PUT /Accounts/Name (name) : update my account name properties
         [HttpPut("Name")]
-        public async Task PutName(string appkey, string appToken, string accountId, string userId,string name)
+        public async Task PutName(string appkey, string appToken, string accountId, string userId, string name)
         {
             var tokenService = Startup.ServicesProvider.GetTokenService();
             var result = await tokenService.ValidateAppToken(appkey, userId, appToken);
             if (result != null && result.AccountId == accountId)
             {
                 var accountService = Startup.ServicesProvider.GetBahamutAccountService();
-                if (name != null)
+                if (!string.IsNullOrWhiteSpace(name) && accountService.ChangeName(accountId, name))
                 {
-                    if (!accountService.ChangeName(accountId, name))
-                    {
-                        Response.StatusCode = (int)HttpStatusCode.NotModified;
-                    }
+                    return;
                 }
-                else
-                {
-                    Response.StatusCode = (int)HttpStatusCode.NotModified;
-                }
-            }
-            else
-            {
                 Response.StatusCode = (int)HttpStatusCode.NotModified;
             }
         }
 
         // PUT /Accounts/Name (name) : update my account birth properties
         [HttpPut("BirthDate")]
-        public async Task PutBirthDate(string appkey, string appToken, string accountId, string userId,string birthdate)
+        public async Task PutBirthDate(string appkey, string appToken, string accountId, string userId, string birthdate)
         {
             var tokenService = Startup.ServicesProvider.GetTokenService();
             var result = await tokenService.ValidateAppToken(appkey, userId, appToken);
             if (result != null && result.AccountId == accountId)
             {
                 var accountService = Startup.ServicesProvider.GetBahamutAccountService();
-                if (birthdate != null)
+                if (!string.IsNullOrWhiteSpace(birthdate) && accountService.ChangeAccountBirthday(accountId, DateTimeUtil.ToDate(birthdate)))
                 {
-                    if (!accountService.ChangeAccountBirthday(accountId, DateTimeUtil.ToDate(birthdate)))
-                    {
-                        Response.StatusCode = (int)HttpStatusCode.NotModified;
-                    }
-                }
-                else
-                {
-                    Response.StatusCode = (int)HttpStatusCode.NotModified;
+                    return;
                 }
             }
-            else
-            {
-                Response.StatusCode = (int)HttpStatusCode.NotModified;
-            }
+            Response.StatusCode = (int)HttpStatusCode.Forbidden;
         }
 
         [HttpPut("Password")]
@@ -105,7 +85,7 @@ namespace AuthenticationServer.Controllers
                 var suc = accountService.ChangePassword(accountId, originPassword, newPassword);
                 if (suc == false)
                 {
-                    Response.StatusCode = (int)HttpStatusCode.NotModified;
+                    Response.StatusCode = (int)HttpStatusCode.Forbidden;
                     return new { msg = "CHANGE_PASSWORD_ERROR" };
                 }
                 return new { msg = "CHANGE_PASSWORD_SUCCESS" };
@@ -129,7 +109,7 @@ namespace AuthenticationServer.Controllers
                 var suc = accountService.ChangeAccountMobile(accountId, newMobile);
                 if (suc == false)
                 {
-                    Response.StatusCode = (int)HttpStatusCode.NotModified;
+                    Response.StatusCode = (int)HttpStatusCode.Forbidden;
                     return new { msg = "CHANGE_MOBILE_ERROR" };
                 }
                 return new { msg = "CHANGE_MOBILE_SUCCESS" };
