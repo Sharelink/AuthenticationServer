@@ -12,6 +12,7 @@ using BahamutCommon;
 using BahamutAspNetCommon;
 using System.IO;
 using Newtonsoft.Json.Serialization;
+using DataLevelDefines;
 
 namespace AuthenticationServer
 {
@@ -47,10 +48,10 @@ namespace AuthenticationServer
     public class Startup
     {
 
-        public IConfiguration Configuration { get; private set; }
+        public static IConfiguration Configuration { get; private set; }
         public static IServiceProvider ServicesProvider { get; private set; }
-        public static string Appkey { get; private set; }
-        public static string Appname { get; private set; }
+        public static string Appkey { get { return Configuration["Data:App:appkey"]; } }
+        public static string Appname { get { return Configuration["Data:App:appname"]; } }
         public static IRedisClientsManager TokenServerClientManager { get; private set; }
         public static IRedisClientsManager ControlServerServiceClientManager { get; private set; }
         public static IHostingEnvironment HostingEnvironment { get; private set; }
@@ -58,7 +59,6 @@ namespace AuthenticationServer
         public Startup(IHostingEnvironment env)
         {
             ReadConfig(env);
-            SetServerConfig();
         }
 
         private void ReadConfig(IHostingEnvironment env)
@@ -75,12 +75,6 @@ namespace AuthenticationServer
             Configuration = builder.Build();
         }
 
-        private void SetServerConfig()
-        {
-            Appkey = Configuration["Data:App:appkey"];
-            Appname = Configuration["Data:App:appname"];
-        }
-
         // This method gets called by the runtime.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -95,13 +89,9 @@ namespace AuthenticationServer
 
             var bahamutDbConString = Configuration["Data:BahamutDBConnection:connectionString"];
 
-            var svrControlDbConString = Configuration["Data:ServerControlDBConnection:connectionString"];
-
-            var tokenServerUrl = Configuration["Data:TokenServer:url"].Replace("redis://", "");
-            TokenServerClientManager = new PooledRedisClientManager(tokenServerUrl);
-
-            var serverControlUrl = Configuration["Data:ControlServiceServer:url"].Replace("redis://", "");
-            ControlServerServiceClientManager = new PooledRedisClientManager(serverControlUrl);
+            TokenServerClientManager = DBClientManagerBuilder.GenerateRedisClientManager(Configuration.GetSection("Data:TokenServer"));
+            ControlServerServiceClientManager = DBClientManagerBuilder.GenerateRedisClientManager(Configuration.GetSection("Data:ControlServiceServer"));
+            
             services.AddSingleton(new AuthenticationService(bahamutDbConString));
             services.AddSingleton(new BahamutAccountService(bahamutDbConString));
             services.AddSingleton(new BahamutAppService(bahamutDbConString));

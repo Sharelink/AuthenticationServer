@@ -3,17 +3,39 @@
     "App": {
       "appname": "AuthenticationServer",
       "appkey": "e1c91545bdb803aaeba2f5d4c86308327b93a2e2",
-      "url": "http://auth.sharelink.online:8086"
+      "urls": "http://auth.sharelink.online:8086"
     },
+
+    "LogConfig": "logsettings.json",
+
     "BahamutDBConnection": {
       "connectionString": "server=bahamutdb.sharelink.online;user id=$usr;password=$psw;Charset=utf8;persistsecurityinfo=False;database=BahamutDB;Pooling=true; Max Pool Size=50;"
     },
+
     "TokenServer": {
-      "url": "redis://$psw@token.sharelink.online:6379"
+      "minPoolSize": 8,
+      "maxPoolSize": 10,
+      "masters": [
+        {
+          "url": "redis://$psw@token.sharelink.online:6379"
+        }
+      ],
+      "slaves": [
+        {
+          "url": "redis://$psw@token.sharelink.online:6379"
+        }
+      ]
     },
 
     "ControlServiceServer": {
-      "url": "redis://$psw@app.sharelink.online:6733"
+      "minPoolSize": 1,
+      "maxPoolSize": 1,
+      "masters": [
+        {
+          "url": "redis://$psw@app.sharelink.online:6733"
+        }
+      ],
+      "slaves": []
     },
 
     "LogConfig": "logsettings.json"
