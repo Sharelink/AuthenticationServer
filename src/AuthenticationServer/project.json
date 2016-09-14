@@ -1,6 +1,10 @@
 {
 
   "dependencies": {
+    "Microsoft.NETCore.App": {
+      "version": "1.0.0",
+      "type": "platform"
+    },
     "Microsoft.AspNetCore.Server.Kestrel": "1.0.0",
     "Microsoft.AspNetCore.Mvc": "1.0.0",
     "Microsoft.AspNetCore.StaticFiles": "1.0.0",
@@ -11,11 +15,7 @@
   },
 
   "frameworks": {
-    "net451": {}
-  },
-
-  "commands": {
-    "web": "Microsoft.AspNetCore.Server.Kestrel"
+    "netcoreapp1.0": {}
   },
 
   "buildOptions": {
@@ -23,15 +23,15 @@
     "preserveCompilationContext": true
   },
 
-  "publishOptions": {
-    "include": [
-      "wwwroot",
-      "Views",
-      "Areas/**/Views",
-      "appsettings.json",
-      "web.config"
-    ]
+  "runtimeOptions": {
+    "configProperties": {
+      "System.GC.Server": true
+    }
   },
 
-  "runtimes": { "ubuntu.14.04-x64": {} }
+  "runtimes": {
+    "ubuntu.14.04-x64": {},
+    "win10-x64": {},
+    "osx.10.11-x64": {}
+  }
 }

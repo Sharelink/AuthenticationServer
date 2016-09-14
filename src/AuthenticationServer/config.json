@@ -8,6 +8,10 @@
 
     "LogConfig": "logsettings.json",
 
+    "AppChannelConfig": "/etc/bahamut/bahamut_appkey_channel.json",
+
+    "InterestedChannelAppKey": [ "7f9e267b33231abe16ea4b6c5fabae11b6103791" ],
+
     "BahamutDBConnection": {
       "connectionString": "server=bahamutdb.sharelink.online;user id=$usr;password=$psw;Charset=utf8;persistsecurityinfo=False;database=BahamutDB;Pooling=true; Max Pool Size=50;"
     },
@@ -36,8 +40,6 @@
         }
       ],
       "slaves": []
-    },
-
-    "LogConfig": "logsettings.json"
+    }
   }
 }

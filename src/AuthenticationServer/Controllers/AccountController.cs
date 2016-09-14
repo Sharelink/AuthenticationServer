@@ -5,6 +5,8 @@ using ServerControlService.Service;
 using System;
 using NLog;
 using Newtonsoft.Json;
+using ServerControlService;
+using BahamutService;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -77,15 +79,14 @@ namespace AuthenticationServer.Controllers
                 var result = authService.LoginValidate(username, password);
                 if (result.Succeeded)
                 {
-                    var svrCtrlService = Startup.ServicesProvider.GetServerControlManagementService();
-                    var appInstance = svrCtrlService.GetMostFreeAppInstance(appkey);
+                    var appInstance = await Startup.AppServerInstanceMonitor.GetInstanceForClientWithAppkeyAsync(appkey);
                     var tokenService = Startup.ServicesProvider.GetTokenService();
                     var newSessionData = new AccountSessionData()
                     {
                         AccountId = result.AccountID,
                         Appkey = appkey
                     };
-                    var atokenResult = await tokenService.AllocateAccessToken(newSessionData);
+                    var atokenResult = await tokenService.AllocateAccessTokenAsync(newSessionData);
                     if (atokenResult == null)
                     {
                         Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
@@ -102,7 +103,8 @@ namespace AuthenticationServer.Controllers
                         accessToken = atokenResult.AccessToken,
                         appServerIP = appInstance.InstanceEndPointIP,
                         appServerPort = appInstance.InstanceEndPointPort,
-                        appServiceUrl = appInstance.InstanceServiceUrl
+                        appServiceUrl = appInstance.InstanceServiceUrl,
+                        info = appInstance.InfoForClient
                     };
                     return Json(parameters);
                 }

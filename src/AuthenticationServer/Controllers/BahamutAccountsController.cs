@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using BahamutCommon;
+using BahamutService;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -18,7 +19,7 @@ namespace AuthenticationServer.Controllers
         public async Task<object> Get(string appkey, string appToken, string accountId, string userId)
         {
             var tokenService = Startup.ServicesProvider.GetTokenService();
-            var result = await tokenService.ValidateAppToken(appkey, userId, appToken);
+            var result = await tokenService.ValidateAppTokenAsync(appkey, userId, appToken);
             if (result != null && result.AccountId == accountId)
             {
                 var accountService = Startup.ServicesProvider.GetBahamutAccountService();
@@ -45,7 +46,7 @@ namespace AuthenticationServer.Controllers
         public async Task PutName(string appkey, string appToken, string accountId, string userId, string name)
         {
             var tokenService = Startup.ServicesProvider.GetTokenService();
-            var result = await tokenService.ValidateAppToken(appkey, userId, appToken);
+            var result = await tokenService.ValidateAppTokenAsync(appkey, userId, appToken);
             if (result != null && result.AccountId == accountId)
             {
                 var accountService = Startup.ServicesProvider.GetBahamutAccountService();
@@ -62,7 +63,7 @@ namespace AuthenticationServer.Controllers
         public async Task PutBirthDate(string appkey, string appToken, string accountId, string userId, string birthdate)
         {
             var tokenService = Startup.ServicesProvider.GetTokenService();
-            var result = await tokenService.ValidateAppToken(appkey, userId, appToken);
+            var result = await tokenService.ValidateAppTokenAsync(appkey, userId, appToken);
             if (result != null && result.AccountId == accountId)
             {
                 var accountService = Startup.ServicesProvider.GetBahamutAccountService();
@@ -78,7 +79,7 @@ namespace AuthenticationServer.Controllers
         public async Task<object> ChangePassword(string appkey, string appToken,string accountId, string userId, string originPassword, string newPassword)
         {
             var tokenService = Startup.ServicesProvider.GetTokenService();
-            var result = await tokenService.ValidateAppToken(appkey, userId, appToken);
+            var result = await tokenService.ValidateAppTokenAsync(appkey, userId, appToken);
             if (result != null && result.AccountId == accountId)
             {
                 var accountService = Startup.ServicesProvider.GetBahamutAccountService();
@@ -101,7 +102,7 @@ namespace AuthenticationServer.Controllers
         public async Task<object> ChangeMobile(string appkey, string appToken, string accountId, string userId, string newMobile)
         {
             var tokenService = Startup.ServicesProvider.GetTokenService();
-            var result = await tokenService.ValidateAppToken(appkey, userId, appToken);
+            var result = await tokenService.ValidateAppTokenAsync(appkey, userId, appToken);
             if (result != null && result.AccountId == accountId)
             {
                 var accountService = Startup.ServicesProvider.GetBahamutAccountService();

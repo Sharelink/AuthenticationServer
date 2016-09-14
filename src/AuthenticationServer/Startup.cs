@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using BahamutService;
 using ServerControlService.Service;
-using ServiceStack.Redis;
 using NLog;
 using NLog.Config;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +12,7 @@ using BahamutAspNetCommon;
 using System.IO;
 using Newtonsoft.Json.Serialization;
 using DataLevelDefines;
+using ServerControlService;
 
 namespace AuthenticationServer
 {
@@ -52,8 +52,7 @@ namespace AuthenticationServer
         public static IServiceProvider ServicesProvider { get; private set; }
         public static string Appkey { get { return Configuration["Data:App:appkey"]; } }
         public static string Appname { get { return Configuration["Data:App:appname"]; } }
-        public static IRedisClientsManager TokenServerClientManager { get; private set; }
-        public static IRedisClientsManager ControlServerServiceClientManager { get; private set; }
+        public static AppServerInstanceMonitor AppServerInstanceMonitor { get; private set; }
         public static IHostingEnvironment HostingEnvironment { get; private set; }
 
         public Startup(IHostingEnvironment env)
@@ -68,8 +67,10 @@ namespace AuthenticationServer
             var configFile = Program.ArgsConfig["config"];
             var baseConfig = builder.AddJsonFile(configFile, true, true).Build();
             var logConfig = baseConfig["Data:LogConfig"];
+            var appChannelConfig = baseConfig["Data:AppChannelConfig"];
             builder.AddJsonFile(configFile, true, true);
             builder.AddJsonFile(logConfig, true, true);
+            builder.AddJsonFile(appChannelConfig, true, true);
             HostingEnvironment = env;
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
@@ -78,6 +79,14 @@ namespace AuthenticationServer
         // This method gets called by the runtime.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Log
+            var logConfig = new LoggingConfiguration();
+            LoggerLoaderHelper.LoadLoggerToLoggingConfig(logConfig, Configuration, "Logger:fileLoggers");
+#if DEBUG
+            LoggerLoaderHelper.AddConsoleLoggerToLogginConfig(logConfig);
+#endif
+            LogManager.Configuration = logConfig;
+
             // Add MVC services to the services container.
             services.AddMvc(config =>
             {
@@ -88,33 +97,28 @@ namespace AuthenticationServer
             });
 
             var bahamutDbConString = Configuration["Data:BahamutDBConnection:connectionString"];
-
-            TokenServerClientManager = DBClientManagerBuilder.GenerateRedisClientManager(Configuration.GetSection("Data:TokenServer"));
-            ControlServerServiceClientManager = DBClientManagerBuilder.GenerateRedisClientManager(Configuration.GetSection("Data:ControlServiceServer"));
-            
             services.AddSingleton(new AuthenticationService(bahamutDbConString));
             services.AddSingleton(new BahamutAccountService(bahamutDbConString));
-            services.AddSingleton(new BahamutAppService(bahamutDbConString));
-            services.AddSingleton(new ServerControlManagementService(ControlServerServiceClientManager));
-            services.AddSingleton(new TokenService(TokenServerClientManager));
 
+            try
+            {
+                var tokenRedis = DBClientManagerBuilder.GenerateRedisConnectionMultiplexer(Configuration.GetSection("Data:TokenServer"));
+                var redis = DBClientManagerBuilder.GenerateRedisConnectionMultiplexer(Configuration.GetSection("Data:ControlServiceServer"));
+                BahamutAppInsanceMonitorManager.Instance.InitManager(redis);
+                services.AddSingleton(new ServerControlManagementService(redis));
+                services.AddSingleton(new TokenService(tokenRedis));
+            }
+            catch (Exception ex)
+            {
+                LogManager.GetLogger("Error").Fatal(ex, "Redis Error:{0}", ex.Message);
+                throw;
+            }
         }
 
         // Configure is called after ConfigureServices is called.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             ServicesProvider = app.ApplicationServices;
-            // Configure the HTTP request pipeline.
-
-            //Log
-            var logConfig = new LoggingConfiguration();
-            LoggerLoaderHelper.LoadLoggerToLoggingConfig(logConfig, Configuration, "Logger:fileLoggers");
-
-            if (env.IsDevelopment())
-            {
-                LoggerLoaderHelper.AddConsoleLoggerToLogginConfig(logConfig);
-            }
-            LogManager.Configuration = logConfig;
 
             // Add static files to the request pipeline.
             app.UseStaticFiles();
@@ -130,38 +134,10 @@ namespace AuthenticationServer
                 // routes.MapWebApiRoute("DefaultApi", "api/{controller}/{id?}");
             });
 
+            //Watch Api Servers Online
+            BahamutAppInsanceMonitorManager.Instance.UseAppServerInstanceMonitor();
+
             LogManager.GetLogger("Main").Info("Server Started!");
-        }
-    }
-
-    public static class IGetServerControlService
-    {
-        public static ServerControlManagementService GetServerControlManagementService(this IServiceProvider provider)
-        {
-            return provider.GetService<ServerControlManagementService>();
-        }
-    }
-
-    public static class IGetBahamutServiceExtension
-    {
-        public static TokenService GetTokenService(this IServiceProvider provider)
-        {
-            return provider.GetService<TokenService>();
-        }
-
-        public static AuthenticationService GetAuthenticationService(this IServiceProvider provider)
-        {
-            return provider.GetService<AuthenticationService>();
-        }
-
-        public static BahamutAccountService GetBahamutAccountService(this IServiceProvider provider)
-        {
-            return provider.GetService<BahamutAccountService>();
-        }
-
-        public static BahamutAppService GetBahamutAppService(this IServiceProvider provider)
-        {
-            return provider.GetService<BahamutAppService>();
         }
     }
 }
