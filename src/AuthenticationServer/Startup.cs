@@ -94,6 +94,7 @@ namespace AuthenticationServer
             }).AddJsonOptions(op =>
             {
                 op.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                op.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
             });
 
             var bahamutDbConString = Configuration["Data:BahamutDBConnection:connectionString"];

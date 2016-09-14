@@ -14,12 +14,20 @@ namespace AuthenticationServer
 
         public async Task<BahamutAppInstance> GetInstanceForClientWithAppkeyAsync(string appkey)
         {
-            var instance = await Startup.ServicesProvider.GetServerControlManagementService().GetAppInstanceAsync("");
-            if (instance == null)
+            try
+            {
+                var instanceId = OnlineAppInstances[appkey].First();
+                var instance = await Startup.ServicesProvider.GetServerControlManagementService().GetAppInstanceAsync(instanceId);
+                if (instance == null)
+                {
+                    throw new NoAppInstanceException();
+                }
+                return instance;
+            }
+            catch (Exception)
             {
                 throw new NoAppInstanceException();
             }
-            return instance;
         }
 
         public void OnInstanceRegisted(BahamutAppInstanceNotification state)
@@ -39,12 +47,18 @@ namespace AuthenticationServer
 
         public void OnInstanceHeartBeating(BahamutAppInstanceNotification state)
         {
-            
+            OnInstanceRegisted(state);
         }
 
         public void OnInstanceOffline(BahamutAppInstanceNotification state)
         {
-            
+            try
+            {
+                OnlineAppInstances[state.Appkey].Remove(state.InstanceId);
+            }
+            catch (Exception)
+            {
+            }
         }
     }
 
