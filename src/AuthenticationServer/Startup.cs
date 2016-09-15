@@ -13,6 +13,7 @@ using System.IO;
 using Newtonsoft.Json.Serialization;
 using DataLevelDefines;
 using ServerControlService;
+using Newtonsoft.Json;
 
 namespace AuthenticationServer
 {
@@ -94,7 +95,8 @@ namespace AuthenticationServer
             }).AddJsonOptions(op =>
             {
                 op.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                op.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+                op.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                op.SerializerSettings.Formatting = Formatting.None;
             });
 
             var bahamutDbConString = Configuration["Data:BahamutDBConnection:connectionString"];
@@ -136,7 +138,7 @@ namespace AuthenticationServer
             });
 
             //Watch Api Servers Online
-            BahamutAppInsanceMonitorManager.Instance.UseAppServerInstanceMonitor();
+            AppServerInstanceMonitor = BahamutAppInsanceMonitorManager.Instance.UseAppServerInstanceMonitor();
 
             LogManager.GetLogger("Main").Info("Server Started!");
         }
